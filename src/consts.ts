@@ -6,4 +6,4 @@ export const SITE_TITLE = "Donnie";
 export const SITE_DESCRIPTION =
   "Thoughts on software, startups, and systems from an entrepreneur and engineer.";
 
-export const EMAIL = "hello@donnie.com";
+export const EMAIL = "donnie@floodfx.com";
