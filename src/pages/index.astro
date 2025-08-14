@@ -1,7 +1,8 @@
 ---
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 import Layout from "../layouts/Layout.astro";
-import { Github, Linkedin } from "lucide-astro";
+import GithubLogo from "phosphor-astro/GithubLogo.astro";
+import LinkedinLogo from "phosphor-astro/LinkedinLogo.astro";
 ---
 
 <Layout
@@ -29,7 +30,7 @@ import { Github, Linkedin } from "lucide-astro";
         class="inline-flex items-center gap-1 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
         aria-label="GitHub profile"
       >
-        <Github class="size-4" />
+        <GithubLogo class="size-4" />
         <span class="text-sm">GitHub</span>
       </a>
       <a
@@ -39,7 +40,7 @@ import { Github, Linkedin } from "lucide-astro";
         class="inline-flex items-center gap-1 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
         aria-label="LinkedIn profile"
       >
-        <Linkedin class="size-4" />
+        <LinkedinLogo class="size-4" />
         <span class="text-sm">LinkedIn</span>
       </a>
     </div>
