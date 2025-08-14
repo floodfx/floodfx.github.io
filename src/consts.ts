@@ -4,6 +4,6 @@
 export const SITE_URL = "https://donnie.com";
 export const SITE_TITLE = "Donnie";
 export const SITE_DESCRIPTION =
-  "A minimal blog built with Astro and Tailwind CSS.";
+  "Thoughts on software, startups, and systems from an entrepreneur and engineer.";
 
 export const EMAIL = "hello@donnie.com";
