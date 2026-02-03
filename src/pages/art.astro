@@ -1,6 +1,6 @@
 ---
-import { ArtDemo } from '../components/ArtDemo';
-import Layout from '../layouts/Layout.astro';
+import { ArtDemo } from "../components/ArtDemo";
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout
@@ -9,11 +9,13 @@ import Layout from '../layouts/Layout.astro';
   className="max-w-4xl"
 >
   <main class="flex flex-col items-center justify-center py-8">
-    <h1 class="text-3xl font-bold mb-6">Generative Art Component</h1>
-    <div class="w-full h-[500px] border border-zinc-200 dark:border-zinc-700 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-zinc-800">
+    <h1 class="mb-6 text-3xl font-bold">Generative Art Component</h1>
+    <div
+      class="h-[500px] w-full overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800"
+    >
       <ArtDemo client:only="react" />
     </div>
-    <p class="text-zinc-500 mt-4 text-center">
+    <p class="mt-4 text-center text-zinc-500">
       Resize the window to see the component adapt.
     </p>
   </main>

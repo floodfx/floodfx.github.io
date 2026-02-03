@@ -1,12 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from "react";
 
 interface GenerativeArtProps {
-  draw: (ctx: CanvasRenderingContext2D, width: number, height: number, frame: number) => void;
+  draw: (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    frame: number,
+  ) => void;
   className?: string;
   animate?: boolean;
 }
 
-export const GenerativeArt: React.FC<GenerativeArtProps> = ({ draw, className, animate = false }) => {
+export const GenerativeArt: React.FC<GenerativeArtProps> = ({
+  draw,
+  className,
+  animate = false,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameId = useRef<number>(0);
@@ -18,7 +27,7 @@ export const GenerativeArt: React.FC<GenerativeArtProps> = ({ draw, className, a
 
     if (!canvas || !container) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let width = container.clientWidth;
@@ -58,8 +67,8 @@ export const GenerativeArt: React.FC<GenerativeArtProps> = ({ draw, className, a
         ctx.scale(dpr, dpr);
 
         if (!animate) {
-           // If not animating, we need to redraw immediately after resize
-           draw(ctx, width, height, 0);
+          // If not animating, we need to redraw immediately after resize
+          draw(ctx, width, height, 0);
         }
       }
     });
@@ -79,8 +88,11 @@ export const GenerativeArt: React.FC<GenerativeArtProps> = ({ draw, className, a
   }, [draw, animate]);
 
   return (
-    <div ref={containerRef} className={`w-full h-full min-h-[300px] ${className || ''}`}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div
+      ref={containerRef}
+      className={`h-full min-h-[300px] w-full ${className || ""}`}
+    >
+      <canvas ref={canvasRef} style={{ display: "block" }} />
     </div>
   );
 };
