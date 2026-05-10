@@ -23,8 +23,9 @@ jobs:
       - name: Install, build, and upload your site
         uses: withastro/action@v3
         with:
-          # Astro 6 requires Node ≥22.12; the action defaults to 20.
-          node-version: 22
+          # Use the current Node LTS. The action defaults to 20, which
+          # is below Astro 6's minimum (≥22.12).
+          node-version: 24
 
   deploy:
     needs: build
