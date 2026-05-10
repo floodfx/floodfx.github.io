@@ -1,0 +1,42 @@
+---
+// Road-bike artwork — a lino-cut illustration loaded from a static
+// asset. Sized to fill its parent .frame-canvas. The marigold ground
+// is painted by the image itself; we just present it.
+---
+
+<div class="rb-art">
+  <img
+    src="/img/road-bike.png"
+    alt="Lino-cut illustration of a road bike on a marigold ground"
+    width="1122"
+    height="1402"
+    loading="lazy"
+    decoding="async"
+  />
+</div>
+
+<style>
+  .rb-art {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .rb-art img {
+    width: 100%;
+    height: 100%;
+    /* `cover` works here because we override the canvas aspect to
+       match the image (see :global block below) — so nothing is
+       cropped and there's no letterboxing to fudge. */
+    object-fit: cover;
+    display: block;
+  }
+</style>
+
+<style is:global>
+  /* Tell the gallery frame to take this image's natural aspect, not
+     the project's `gallerySize` default. Keeps the print full-bleed
+     in the matte without any visible marigold fallback bars. */
+  .frame-canvas:has(.rb-art) {
+    aspect-ratio: 1122 / 1402;
+  }
+</style>

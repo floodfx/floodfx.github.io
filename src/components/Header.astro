@@ -1,19 +1,134 @@
 ---
-import { EMAIL } from "../consts";
+import { Icon } from "astro-icon/components";
 import ThemeToggle from "./ThemeToggle.astro";
 ---
 
-<header class="mb-6 flex items-center justify-between" transition:name="header">
-  <nav class="flex items-center gap-4">
-    <a href="/"> home </a>
-    <a href="/posts"> posts </a>
-    <a href={`mailto:${EMAIL}`}>email</a>
-  </nav>
-  <ThemeToggle />
+<header
+  class="sticky top-0 z-50 border-b border-line-soft bg-bg/85 backdrop-blur-md backdrop-saturate-150"
+  transition:name="header"
+>
+  <div class="mx-auto flex max-w-[1100px] items-center justify-between px-6 py-4">
+    <a href="/" class="flex items-center gap-3 text-fg no-underline">
+      <span class="logo-tank" aria-hidden="true">
+        <svg
+          class="logo-wave"
+          viewBox="0 0 80 40"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 0 9 Q 5 5, 10 9 T 20 9 T 30 9 T 40 9 T 50 9 T 60 9 T 70 9 T 80 9 L 80 40 L 0 40 Z"
+          ></path>
+        </svg>
+        <span class="logo-letters">DF</span>
+      </span>
+      <span class="font-display text-[22px] font-bold italic">Donnie Flood</span>
+    </a>
+
+    <nav class="flex items-center gap-5">
+      <a class="nav-link" href="/#projects">Projects</a>
+      <a class="nav-link" href="/posts">Writing</a>
+      <a
+        class="nav-icon"
+        href="https://github.com/floodfx"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub"
+      >
+        <Icon name="simple-icons:github" width="16" height="16" />
+      </a>
+      <a
+        class="nav-icon"
+        href="https://linkedin.com/in/donnieflood"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="LinkedIn"
+      >
+        <Icon name="simple-icons:linkedin" width="16" height="16" />
+      </a>
+      <ThemeToggle />
+    </nav>
+  </div>
 </header>
 
 <style>
-  a {
-    @apply font-medium text-zinc-500 hover:text-zinc-900 hover:underline dark:hover:text-zinc-100;
+  @reference "../styles/global.css";
+
+  /* — Water-tank logo —
+     A small rectangular tank, almost full. The cream sliver at the
+     top is the "air"; the cobalt water has a wavy surface that
+     drifts sideways. DF floats over it in cream. Tweak `--water` to
+     change how full the tank is. */
+  .logo-tank {
+    --water: 78%;
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--c-cream);
+    box-shadow:
+      inset 0 0 0 1.5px var(--c-cobalt-ink),
+      inset 0 1px 2px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .logo-wave {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 200%;
+    height: var(--water);
+    display: block;
+    animation: logo-wave-slide 4.5s linear infinite;
+  }
+  .logo-wave path {
+    fill: var(--c-cobalt);
+  }
+  .logo-letters {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1;
+    padding-bottom: 0px;
+    color: var(--c-cream);
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  }
+  @keyframes logo-wave-slide {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-wave { animation: none; }
+  }
+
+  .nav-link {
+    @apply relative text-sm font-medium text-fg-soft no-underline hover:text-fg;
+    padding: 4px 0;
+  }
+  .nav-icon {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full text-fg-soft transition-colors hover:text-fg;
+  }
+  .nav-icon:hover {
+    color: var(--c-coral);
+  }
+  .nav-link:hover::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    background: var(--c-coral);
+  }
+  @media (max-width: 700px) {
+    .nav-link {
+      font-size: 13px;
+    }
   }
 </style>

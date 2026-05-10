@@ -1,0 +1,59 @@
+---
+// Hotdogjs artwork — 9 hotdogs in a 3x3 grid, Warhol Marilyn-style.
+// Each cell pairs a flat pop background with a hue-shifted emoji so
+// no two cells read the same way. Filters do the heavy lifting; the
+// emoji itself is the same character throughout.
+
+const cells = [
+  { bg: "var(--c-cobalt)",     filter: "hue-rotate(50deg) saturate(1.4)" },
+  { bg: "var(--c-marigold)",   filter: "hue-rotate(150deg) saturate(1.5)" },
+  { bg: "#c33a78",             filter: "hue-rotate(220deg) saturate(1.4) brightness(1.1)" },
+  { bg: "var(--c-olive)",      filter: "hue-rotate(280deg) saturate(1.6)" },
+  { bg: "var(--c-plum)",       filter: "hue-rotate(70deg) saturate(1.6) brightness(1.15)" },
+  { bg: "var(--c-rose)",       filter: "hue-rotate(180deg) saturate(1.4)" },
+  { bg: "var(--c-terracotta)", filter: "hue-rotate(120deg) saturate(1.5)" },
+  { bg: "#f3bf52",             filter: "hue-rotate(240deg) saturate(1.4)" },
+  { bg: "var(--c-sage)",       filter: "hue-rotate(330deg) saturate(1.5) brightness(1.1)" },
+];
+---
+
+<div class="hd-grid">
+  {
+    cells.map(({ bg, filter }) => (
+      <div class="hd-cell" style={`background:${bg}`}>
+        <span class="hd-emoji" style={`filter:${filter}`}>🌭</span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .hd-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    /* Hairline gutters between cells — Warhol prints have a clear
+       boundary between repetitions. White-ish so the pop colors pop. */
+    gap: 2px;
+    background: #f1ece2;
+    container-type: inline-size;
+  }
+  .hd-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hd-emoji {
+    /* Cell is one third of the canvas wide; emoji sized to fill it
+       generously. Drop-shadow gives the silkscreen offset. */
+    font-size: 26cqi;
+    line-height: 1;
+    filter: saturate(1.4);
+    /* Some browsers render emoji as color glyphs that ignore filters;
+       a tiny drop-shadow nudges the rendering into the filtered path. */
+    will-change: filter;
+  }
+</style>
