@@ -25,6 +25,3 @@ pnpm-debug.log*
 
 # raw photo originals
 IMG_*.heic
-
-# MCP local server config
-.mcp.json
