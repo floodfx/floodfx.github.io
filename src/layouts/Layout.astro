@@ -1,80 +1,132 @@
 ---
-import { ViewTransitions } from "astro:transitions";
 import Header from "../components/Header.astro";
-import { cn } from "../lib/utils";
+import Footer from "../components/Footer.astro";
+import { ClientRouter } from "astro:transitions";
+import {
+  AUTHOR_NAME,
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+  SITE_LOCALE,
+  SITE_TITLE,
+  THEME_COLOR,
+} from "../consts";
+import { ogImageUrl } from "../lib/utils";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description: string;
+  /** Override the auto-generated OG image with a static URL. */
   image?: string;
-  className?: string;
+  /** "website" (default) or "article" for post pages. */
+  type?: "website" | "article";
+  /** ISO date string — only used on article pages. */
+  publishedTime?: string;
+  /** ISO date string — last update of an article. */
+  modifiedTime?: string;
+  /** Optional list of tag strings for article pages. */
+  tags?: string[];
+  /** Author override (defaults to site author). */
+  author?: string;
+  /** Hide the page from search engines. */
+  noindex?: boolean;
+  bodyClass?: string;
 }
-
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const {
   title,
   description,
-  image = "/static/blog-placeholder.png",
-  className,
+  image,
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  tags,
+  author = AUTHOR_NAME,
+  noindex = false,
+  bodyClass,
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// If the caller supplied a static image use it; otherwise fall back
+// to the per-route auto-generated OG card.
+const ogImage = new URL(image ?? ogImageUrl(Astro.url.pathname), Astro.site);
+
+// Page title in the browser bar — every non-home page is suffixed
+// with the site title for context, the home page stands alone.
+const fullTitle =
+  title === SITE_TITLE ? title : `${title} · ${SITE_TITLE}`;
 ---
 
 <html lang="en">
   <head>
-    <!-- Global Metadata -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content={THEME_COLOR} />
+    <meta name="color-scheme" content="light dark" />
 
-    <!-- Font preloads -->
-    <link
-      rel="preload"
-      href="/fonts/geist-variable.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/geist-mono-variable.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-
-    <!-- Canonical URL -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
-    <!-- Primary Meta Tags -->
-    <title>{title}</title>
-    <meta name="title" content={title} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700;1,900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500&family=Sixtyfour&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
     <meta name="description" content={description} />
+    <meta name="author" content={author} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE_TITLE} />
+    <meta property="og:locale" content={SITE_LOCALE} />
     <meta property="og:url" content={Astro.url} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(image, Astro.url)} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content={String(OG_IMAGE_WIDTH)} />
+    <meta property="og:image:height" content={String(OG_IMAGE_HEIGHT)} />
+    <meta property="og:image:alt" content={description} />
+
+    {type === "article" && publishedTime && (
+      <meta property="article:published_time" content={publishedTime} />
+    )}
+    {type === "article" && modifiedTime && (
+      <meta property="article:modified_time" content={modifiedTime} />
+    )}
+    {type === "article" && (
+      <meta property="article:author" content={author} />
+    )}
+    {type === "article" && tags?.map((tag) => (
+      <meta property="article:tag" content={tag} />
+    ))}
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={new URL(image, Astro.url)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={Astro.url} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={description} />
+    <meta name="twitter:creator" content="@floodfx" />
 
-    <ViewTransitions />
+    <!-- Per-page structured data — see slot below for JSON-LD. -->
+    <slot name="head" />
+
+    <ClientRouter />
   </head>
-  <body
-    class="font-sans text-zinc-900 antialiased transition-colors dark:bg-zinc-900 dark:text-zinc-200"
-  >
-    <div class={cn("max-w-xl mx-auto p-4", className)}>
+  <body class={bodyClass}>
+    <div class="min-h-screen">
       <Header />
       <slot />
+      <Footer />
     </div>
   </body>
 </html>
@@ -82,7 +134,6 @@ const {
 <script is:inline>
   const setTheme = () => {
     let theme;
-
     if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
       theme = localStorage.getItem("theme");
     } else {
@@ -91,7 +142,11 @@ const {
         : "light";
     }
 
-    document.documentElement.classList[theme ? "add" : "remove"](theme);
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
 
     if (typeof localStorage !== "undefined") {
       const observer = new MutationObserver(() => {
@@ -106,6 +161,5 @@ const {
   };
 
   setTheme();
-
   document.addEventListener("astro:after-swap", setTheme);
 </script>

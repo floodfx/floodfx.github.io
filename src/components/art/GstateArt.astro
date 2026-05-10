@@ -1,0 +1,348 @@
+---
+// Gstate artwork — Truchet-style tiling.
+//
+// Every tile draws connections between the four edge midpoints of its
+// cell (top: 50,0 — right: 100,50 — bottom: 50,100 — left: 0,50). Because
+// every tile uses the same connection points, *any* arrangement of
+// tiles produces continuous runs across cell boundaries — the way the
+// "complex modules" reference works. No path-finding required: the
+// connectivity falls out of the tile geometry.
+//
+// Bias is toward arcs (the classic Truchet curve) so the wall reads as
+// long flowing strokes broken only occasionally by junctions and stubs.
+//
+// Deterministic: a seeded PRNG gives the same output every build.
+// Tweak SEED below to roll a different composition.
+
+const COLS = 14;
+const ROWS = 9;
+const SEED = 0xb2c4_1f3a;
+
+function mulberry32(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry32(SEED);
+const pick = <T,>(arr: readonly T[]) => arr[Math.floor(rand() * arr.length)];
+
+// Tile types — each draws connections between subsets of the four
+// edge midpoints. Quantities in the array bias the random pick:
+// arcs are most common so the wall reads as long flowing curves,
+// "feature" tiles (rosettes, big nodes) appear sparingly.
+const MODULES = [
+  "arc",            // single quarter arc (top→right, rotated for variety)
+  "arc",
+  "arc",
+  "arc",
+  "arc",
+  "arc-double",     // two non-touching quarter arcs — the classic Truchet
+  "arc-double",
+  "arc-double",
+  "arc-thin-pair",  // arc with a thinner parallel companion
+  "arc-with-dot",   // arc plus a node dot at the cell center
+  "straight",       // pass-through line (left↔right)
+  "straight-double",// two parallel pass-through lines
+  "elbow",          // sharp 90° corner instead of curved
+  "tee",            // T junction (3 edges)
+  "cross",          // 4-way junction
+  "stub",           // half-line into the cell, ending in a dot (terminator)
+  "stub",
+  "node",           // central dot, no connections
+  "node-large",     // large filled circle — feature state
+  "ring",           // ring with no connections
+  "rosette",        // small concentric arc burst — rare feature tile
+  "empty",
+  "empty",
+] as const;
+type Module = (typeof MODULES)[number];
+
+const cells: Module[] = [];
+for (let i = 0; i < COLS * ROWS; i++) cells.push(pick(MODULES) as Module);
+// 4-step rotation: any orientation legal because all connection points
+// are edge midpoints (rotation preserves them).
+const rotations = cells.map(() => Math.floor(rand() * 4) * 90);
+
+// Coral accents — pick whole tiles. Adjacent coral tiles form coral
+// runs through the pattern.
+const accentIdx = new Set<number>();
+const accentTarget = Math.floor(COLS * ROWS * 0.18);
+while (accentIdx.size < accentTarget) {
+  const i = Math.floor(rand() * COLS * ROWS);
+  if (cells[i] !== "empty") accentIdx.add(i);
+}
+
+const W = 100;
+const H = 100;
+const STROKE = 8;
+
+// Palette: coral ground; most strokes stay in the cream "ink" tone,
+// while the accented strokes flip to ink-black for high contrast
+// against the coral background.
+const BG = "#e8553e";
+const INK = "#f3e6c8";
+const ACCENT = "#1c1814";
+---
+
+<svg
+  class="gstate-art"
+  viewBox={`0 0 ${COLS * W} ${ROWS * H}`}
+  preserveAspectRatio="xMidYMid slice"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="Generative tiled pattern of state-machine motifs"
+>
+  <rect width="100%" height="100%" fill={BG}></rect>
+
+  {
+    cells.map((m, i) => {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      const x = col * W;
+      const y = row * H;
+      const rot = rotations[i];
+      const accent = accentIdx.has(i);
+      const stroke = accent ? ACCENT : INK;
+      const fill = accent ? ACCENT : INK;
+      return (
+        <g transform={`translate(${x} ${y}) rotate(${rot} 50 50)`}>
+          {m === "empty" && null}
+
+          {/* Single quarter arc connecting top midpoint to right midpoint.
+              Centered at the (100, 0) corner, radius 50. */}
+          {m === "arc" && (
+            <path
+              d="M 50 0 A 50 50 0 0 1 100 50"
+              fill="none"
+              stroke={stroke}
+              stroke-width={STROKE}
+              stroke-linecap="butt"
+            />
+          )}
+
+          {/* Two complementary corner arcs: top-right + bottom-left.
+              The classic Truchet pair — at scale these tile into the
+              characteristic flowing knots. */}
+          {m === "arc-double" && (
+            <>
+              <path
+                d="M 50 0 A 50 50 0 0 1 100 50"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <path
+                d="M 0 50 A 50 50 0 0 1 50 100"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+            </>
+          )}
+
+          {/* Straight pass-through, left edge midpoint to right. */}
+          {m === "straight" && (
+            <line
+              x1="0"
+              y1="50"
+              x2="100"
+              y2="50"
+              stroke={stroke}
+              stroke-width={STROKE}
+            />
+          )}
+
+          {/* Sharp 90° elbow — top edge midpoint to right edge midpoint
+              via the cell center. Reads more rigid than the arc. */}
+          {m === "elbow" && (
+            <polyline
+              points="50,0 50,50 100,50"
+              fill="none"
+              stroke={stroke}
+              stroke-width={STROKE}
+              stroke-linejoin="miter"
+            />
+          )}
+
+          {/* T junction: top + left + right edges meet at center, with
+              a node dot to suggest a state at the branch. */}
+          {m === "tee" && (
+            <>
+              <line
+                x1="0"
+                y1="50"
+                x2="100"
+                y2="50"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <line
+                x1="50"
+                y1="0"
+                x2="50"
+                y2="50"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <circle cx="50" cy="50" r="7" fill={fill} />
+            </>
+          )}
+
+          {/* 4-way junction — all edges meet at center. */}
+          {m === "cross" && (
+            <>
+              <line
+                x1="0"
+                y1="50"
+                x2="100"
+                y2="50"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <line
+                x1="50"
+                y1="0"
+                x2="50"
+                y2="100"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <circle cx="50" cy="50" r="6" fill={fill} />
+            </>
+          )}
+
+          {/* Stub — half-segment from left edge into the cell, ending
+              in a dot. Reads as an arrow head / terminal state. */}
+          {m === "stub" && (
+            <>
+              <line
+                x1="0"
+                y1="50"
+                x2="40"
+                y2="50"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <circle cx="44" cy="50" r="8" fill={fill} />
+            </>
+          )}
+
+          {/* Lone node — a state with no transitions in this cell. */}
+          {m === "node" && <circle cx="50" cy="50" r="9" fill={fill} />}
+
+          {/* Feature node — a much larger circle, used sparingly. */}
+          {m === "node-large" && (
+            <circle cx="50" cy="50" r="22" fill={fill} />
+          )}
+
+          {/* Standalone ring — outline circle, no edge connections. */}
+          {m === "ring" && (
+            <circle
+              cx="50"
+              cy="50"
+              r="22"
+              fill="none"
+              stroke={stroke}
+              stroke-width={STROKE * 0.85}
+            />
+          )}
+
+          {/* Quarter arc with a thinner companion — reads as a routed
+              transition with an annotation. */}
+          {m === "arc-thin-pair" && (
+            <>
+              <path
+                d="M 50 0 A 50 50 0 0 1 100 50"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <path
+                d="M 50 18 A 32 32 0 0 1 82 50"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE * 0.45}
+              />
+            </>
+          )}
+
+          {/* Arc + node dot at center — gives the curve a punctuation
+              point without breaking its flow. */}
+          {m === "arc-with-dot" && (
+            <>
+              <path
+                d="M 50 0 A 50 50 0 0 1 100 50"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE}
+              />
+              <circle cx="50" cy="50" r="6" fill={fill} />
+            </>
+          )}
+
+          {/* Two parallel pass-through strokes. */}
+          {m === "straight-double" && (
+            <>
+              <line
+                x1="0"
+                y1="38"
+                x2="100"
+                y2="38"
+                stroke={stroke}
+                stroke-width={STROKE * 0.75}
+              />
+              <line
+                x1="0"
+                y1="62"
+                x2="100"
+                y2="62"
+                stroke={stroke}
+                stroke-width={STROKE * 0.75}
+              />
+            </>
+          )}
+
+          {/* Rosette — concentric quarter arcs forming a corner burst.
+              Rare feature tile; functions as a visual punctuation. */}
+          {m === "rosette" && (
+            <>
+              <path
+                d="M 12 50 A 38 38 0 0 1 50 12"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE * 0.5}
+              />
+              <path
+                d="M 22 50 A 28 28 0 0 1 50 22"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE * 0.5}
+              />
+              <path
+                d="M 32 50 A 18 18 0 0 1 50 32"
+                fill="none"
+                stroke={stroke}
+                stroke-width={STROKE * 0.5}
+              />
+              <circle cx="50" cy="50" r="4" fill={fill} />
+            </>
+          )}
+        </g>
+      );
+    })
+  }
+</svg>
+
+<style>
+  .gstate-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>

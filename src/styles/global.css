@@ -1,83 +1,358 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  @font-face {
-    font-family: "Geist";
-    src: url("/fonts/geist-variable.woff2") format("woff2");
-    font-display: swap;
-  }
-  @font-face {
-    font-family: "Geist Mono";
-    src: url("/fonts/geist-mono-variable.woff2") format("woff2");
-    font-display: swap;
-  }
-  html.dark .astro-code,
-  html.dark .astro-code span {
-    color: var(--shiki-dark) !important;
-    background-color: var(--shiki-dark-bg) !important;
-    font-style: var(--shiki-dark-font-style) !important;
-    font-weight: var(--shiki-dark-font-weight) !important;
-    text-decoration: var(--shiki-dark-text-decoration) !important;
-  }
+/* ============================================================
+   RIAD — Bohemian Mediterranean design system
+   Cobalt · Marigold · Olive · Coral · Plum · Terracotta · Cream
+   ============================================================
+   Tokens are exposed as both CSS custom properties (so you can
+   reference them in raw CSS like `var(--c-cobalt)`) AND as Tailwind
+   theme tokens via @theme — so utilities like `bg-cobalt`,
+   `text-marigold`, `font-display`, `rounded-arch` Just Work.
+
+   To tweak the system: edit the values in :root below and the
+   matching @theme entries. Add a color: drop a new --c-* var,
+   then add `--color-yourname: var(--c-yourname)` under @theme.
+   ============================================================ */
+
+:root {
+  /* — Core palette ————————————————————————— */
+  --c-cobalt:        #1f4ea8;
+  --c-cobalt-ink:    #14306b;
+  --c-cobalt-soft:   #5d82c9;
+
+  --c-marigold:      #e9a528;
+  --c-marigold-deep: #c47a0e;
+
+  --c-coral:         #e8553e;
+  --c-coral-deep:    #b8341f;
+
+  --c-olive:         #6b7a3a;
+  --c-olive-deep:    #3f4a1f;
+  --c-sage:          #a8b27a;
+
+  --c-plum:          #6a2a4a;
+  --c-terracotta:    #c46a4a;
+  --c-rose:          #e89a9a;
+
+  --c-cream:         #f1ece2;
+  --c-cream-2:       #e4ddcd;
+  --c-paper:         #f7f3ea;
+  --c-ink:           #1c1814;
+  --c-ink-soft:      #3a342c;
+
+  /* — Semantic (light) ————————————————————— */
+  --bg:        var(--c-cream);
+  --bg-elev:   var(--c-paper);
+  --bg-tint:   #e0d9c8;
+  --fg:        var(--c-ink);
+  --fg-soft:   var(--c-ink-soft);
+  --fg-mute:   #6a6055;
+  --line:      #2a241c;
+  --line-soft: #c5bca8;
+  --primary:   var(--c-cobalt);
+  --primary-fg: #fff8e6;
+  --accent:    var(--c-coral);
+  --accent-2:  var(--c-marigold);
+
+  /* — Shadows ——————————————————————————— */
+  --shadow-1: 0 1px 0 rgba(27, 20, 16, 0.12), 0 2px 6px rgba(27, 20, 16, 0.06);
+  --shadow-2: 0 2px 0 rgba(27, 20, 16, 0.18), 0 8px 24px rgba(27, 20, 16, 0.1);
+  --shadow-cut: 4px 4px 0 var(--c-ink);
 }
 
+html.dark,
+[data-theme="dark"] {
+  --c-cream:    #1a1410;
+  --c-cream-2:  #221a14;
+  --c-paper:    #14100c;
+  --c-ink:      #f3e6c8;
+  --c-ink-soft: #d9c8a3;
+
+  --bg:        #14100c;
+  --bg-elev:   #1f1812;
+  --bg-tint:   #2a201a;
+  --fg:        #f3e6c8;
+  --fg-soft:   #d9c8a3;
+  --fg-mute:   #9a8870;
+  --line:      #f3e6c8;
+  --line-soft: #5a4836;
+  --primary:   #6f96e0;
+  --primary-fg: #0c1428;
+  --accent:    #f08066;
+  --accent-2:  #f3bf52;
+
+  --shadow-cut: 4px 4px 0 #f3e6c8;
+}
+
+/* ============================================================
+   @theme — wire CSS variables into Tailwind utilities.
+   ============================================================ */
+@theme {
+  /* fonts */
+  --font-sans: "Atkinson Hyperlegible", "Söhne", -apple-system, system-ui, sans-serif;
+  --font-display: "Playfair Display", "Recoleta", Georgia, serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* palette — direct names (utility-friendly) */
+  --color-cobalt: var(--c-cobalt);
+  --color-cobalt-ink: var(--c-cobalt-ink);
+  --color-cobalt-soft: var(--c-cobalt-soft);
+  --color-marigold: var(--c-marigold);
+  --color-marigold-deep: var(--c-marigold-deep);
+  --color-coral: var(--c-coral);
+  --color-coral-deep: var(--c-coral-deep);
+  --color-olive: var(--c-olive);
+  --color-olive-deep: var(--c-olive-deep);
+  --color-sage: var(--c-sage);
+  --color-plum: var(--c-plum);
+  --color-terracotta: var(--c-terracotta);
+  --color-rose: var(--c-rose);
+  --color-cream: var(--c-cream);
+  --color-cream-2: var(--c-cream-2);
+  --color-paper: var(--c-paper);
+  --color-ink: var(--c-ink);
+  --color-ink-soft: var(--c-ink-soft);
+
+  /* palette — semantic */
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-bg-tint: var(--bg-tint);
+  --color-fg: var(--fg);
+  --color-fg-soft: var(--fg-soft);
+  --color-fg-mute: var(--fg-mute);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+
+  /* radii */
+  --radius-arch: 200px 200px 18px 18px;
+
+  /* shadows */
+  --shadow-cut: 4px 4px 0 var(--c-ink);
+}
+
+/* ============================================================
+   Base typography — the design system's defaults.
+   ============================================================ */
+html,
+body {
+  margin: 0;
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "ss02";
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-soft);
+}
+
+/* ============================================================
+   Component classes — kept thin; reuse via @apply where useful
+   so they're still trivial to override with utilities.
+   ============================================================ */
 @layer components {
-  article {
-    p {
-      @apply my-4 leading-relaxed;
-    }
-    h1 {
-      @apply my-4 text-xl font-medium dark:text-white;
-    }
-    h2 {
-      @apply my-4 text-lg font-medium dark:text-white;
-    }
-    h3,
-    h4,
-    h5,
-    h6 {
-      @apply my-4 font-medium dark:text-white;
-    }
-    :not(pre) > code {
-      @apply whitespace-nowrap rounded border bg-zinc-200/50 px-1 py-0.5 font-mono text-sm font-medium text-black dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-white;
-    }
-    pre:has(code) {
-      @apply my-4 max-h-[600px] overflow-auto rounded-lg border p-4 font-mono text-sm font-medium dark:border-zinc-700;
-    }
-    img {
-      @apply my-4 rounded-lg border dark:border-zinc-700;
-    }
-    video {
-      @apply my-4 rounded-lg border dark:border-zinc-700;
-    }
-    blockquote {
-      @apply my-4 border-l-2 pl-4;
-    }
-    a {
-      @apply text-blue-500 underline;
-    }
-    table {
-      @apply my-4 w-full table-auto border-collapse text-sm;
-      th {
-        @apply border-b p-4 text-left font-medium dark:border-zinc-700;
-      }
-      td {
-        @apply border-b bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800;
-      }
-    }
-    ol {
-      @apply my-1 list-inside list-decimal space-y-1 [&_ol]:pl-5 [&_ul]:pl-5;
-    }
-    ul {
-      @apply my-1 list-inside list-disc space-y-1 [&_ol]:pl-5 [&_ul]:pl-5;
-    }
-    kbd {
-      @apply rounded border border-b-2 bg-zinc-100 px-1 py-0.5 font-mono text-xs font-medium text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-white;
-    }
-    mark {
-      @apply dark:bg-yellow-500/50 dark:text-white;
-    }
+  /* — Buttons — */
+  .btn {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: 1px solid var(--line-soft);
+    cursor: pointer;
+    background: var(--bg-elev);
+    color: var(--fg);
+    border-radius: 10px;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--c-cobalt);
+    color: var(--c-cream);
+    border-color: var(--c-cobalt);
+  }
+  .btn-primary:hover {
+    background: var(--c-cobalt-ink);
+    border-color: var(--c-cobalt-ink);
+  }
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--line-soft);
+  }
+  .btn-ghost:hover {
+    background: var(--bg-tint);
+  }
+
+  /* — Badges — */
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+  .badge-cobalt   { background: var(--c-cobalt);   color: var(--c-cream); }
+  .badge-marigold { background: var(--c-marigold); color: var(--c-ink); }
+  .badge-coral    { background: var(--c-coral);    color: var(--c-cream); }
+  .badge-olive    { background: var(--c-olive);    color: var(--c-cream); }
+  .badge-plum     { background: var(--c-plum);     color: var(--c-cream); }
+  .badge-outline  { background: transparent;       color: var(--fg); border-color: var(--line-soft); }
+
+  /* — Tag (post tag chip) — */
+  .tag {
+    display: inline-block;
+    padding: 2px 9px;
+    background: transparent;
+    border: 1px solid var(--line-soft);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--fg-soft);
   }
 }
+
+/* ============================================================
+   Article (markdown) typography for posts.
+   ============================================================ */
+article {
+  font-family: var(--font-sans);
+  color: var(--fg);
+  line-height: 1.7;
+  font-size: 17px;
+}
+article p { margin: 1.1em 0; }
+article h1, article h2, article h3, article h4 {
+  font-family: var(--font-display);
+  font-style: italic;
+  margin: 1.6em 0 0.5em;
+}
+article h1 { font-size: 2rem; }
+article h2 { font-size: 1.6rem; }
+article h3 { font-size: 1.3rem; }
+article a {
+  color: var(--c-cobalt);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+html.dark article a { color: var(--c-cobalt-soft); }
+article a:hover { color: var(--c-coral); }
+article :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 1px 6px;
+  background: var(--bg-tint);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  color: var(--fg);
+}
+article pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 16px 20px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  overflow: auto;
+  margin: 1.4em 0;
+}
+article blockquote {
+  margin: 1.4em 0;
+  padding: 0 0 0 1.2em;
+  border-left: 3px solid var(--c-coral);
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--fg-soft);
+}
+article ul, article ol {
+  padding-left: 1.4em;
+  margin: 1em 0;
+}
+article ul { list-style: disc; }
+article ol { list-style: decimal; }
+article img,
+article video {
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+  margin: 1.4em 0;
+}
+article hr {
+  border: 0;
+  border-top: 1px dashed var(--line-soft);
+  margin: 2em 0;
+}
+
+/* Responsive video embed (YouTube, Vimeo, etc.) — wrap any iframe
+   in <div class="video-embed"> for a 16:9 fluid container. */
+article .video-embed {
+  position: relative;
+  padding-top: 56.25%;
+  margin: 1.6em 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+}
+article .video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Shiki dual-theme: light by default, dark when html.dark is set */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+html.dark .astro-code,
+html.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* ============================================================
+   Tweakable bits — the design system "knobs". Override these
+   in a single place to retheme.
+   ============================================================ */
+.surface       { background: var(--bg-elev); border: 1px solid var(--line-soft); border-radius: 18px; }
+.surface-sunk  { background: var(--bg-tint); }
+.divider-soft  { border-color: var(--line-soft); }

@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# raw photo originals
+IMG_*.heic
+
+# MCP local server config
+.mcp.json

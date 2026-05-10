@@ -1,0 +1,81 @@
+---
+// LiveViewJS poster — three mono rows on cobalt:
+//   LIVE   ← full-width (letters spread to edges), pulses in opacity
+//   VIEW   ← full-width, static
+//   JS     ← left-aligned, static (smaller visual weight, doesn't span)
+// Sized to fill its parent .frame-canvas (which provides aspect ratio).
+---
+
+<div class="lvjs-poster">
+  <div class="lvjs-stack">
+    <div class="lvjs-row lvjs-spread lvjs-pulse" aria-label="LIVE">
+      <span>L</span><span>I</span><span>V</span><span>E</span>
+    </div>
+    <div class="lvjs-row lvjs-spread" aria-label="VIEW">
+      <span>V</span><span>I</span><span>E</span><span>W</span>
+    </div>
+    <div class="lvjs-row lvjs-spread" aria-label="JS">
+      <span>J</span><span>S</span>
+      <span class="lvjs-ghost" aria-hidden="true">·</span>
+      <span class="lvjs-ghost" aria-hidden="true">·</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .lvjs-poster {
+    position: absolute;
+    inset: 0;
+    background: var(--c-cobalt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Container query context so type scales with this canvas. */
+    container-type: inline-size;
+    /* Minimal breathing room — type is meant to read edge-to-edge. */
+    padding: 3% 4%;
+  }
+
+  .lvjs-stack {
+    width: 100%;
+    color: #fff;
+    font-family: "Sixtyfour", var(--font-mono);
+    line-height: 1;
+    /* Sixtyfour glyphs read like CRT pixels — sized to fill the
+       canvas top-to-bottom and edge-to-edge. */
+    font-size: clamp(40px, 22cqi, 170px);
+  }
+
+  .lvjs-row {
+    display: flex;
+  }
+  .lvjs-spread {
+    justify-content: space-between;
+  }
+  /* Invisible placeholders preserve the 4-cell rhythm so "J" and "S"
+     line up with the letters in LIVE / VIEW above them. */
+  .lvjs-ghost {
+    visibility: hidden;
+  }
+
+  /* Only the LIVE row pulses — opacity only, no movement. */
+  .lvjs-pulse {
+    animation: lvjs-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes lvjs-pulse {
+    /* lub */
+    0%   { opacity: 1; }
+    14%  { opacity: 0.55; }
+    28%  { opacity: 1; }
+    /* dub */
+    42%  { opacity: 0.55; }
+    56%  { opacity: 1; }
+    /* rest */
+    100% { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lvjs-pulse { animation: none; }
+  }
+</style>
