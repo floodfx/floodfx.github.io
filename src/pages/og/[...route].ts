@@ -69,6 +69,15 @@ const atkinson = readFileSync(
   fontPath("@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-400-normal.woff"),
 );
 
+// Rasterized brand logo (mirrors public/favicon.svg's design, but
+// with "DF" instead of "D" since the OG card has room for both
+// letters). Inlined as a base64 data URL so the OG endpoint
+// doesn't depend on a separate HTTP fetch at build time.
+const logoPng = readFileSync(
+  path.join(process.cwd(), "src", "og", "logo.png"),
+);
+const logoDataUrl = `data:image/png;base64,${logoPng.toString("base64")}`;
+
 // — Riad palette ---------------------------------------------------
 const COBALT = "#1f4ea8";
 const COBALT_INK = "#14306b";
@@ -78,69 +87,19 @@ const CREAM = "#f1ece2";
 const INK = "#1c1814";
 const INK_SOFT = "#3a342c";
 
-// Water-tank brand mark, laid out with flex divs (Satori has limited
-// SVG support — no <text> element). The wavy water surface is drawn
-// as a single inline SVG <path>, which Satori does support.
-const TankLogo = (size: number) => {
-  const water = Math.round(size * 0.7);
-  return {
-    type: "div",
-    props: {
-      style: {
-        width: `${size}px`,
-        height: `${size}px`,
-        position: "relative",
-        background: CREAM,
-        borderRadius: `${Math.round(size * 0.18)}px`,
-        border: `${Math.max(2, Math.round(size * 0.045))}px solid ${COBALT_INK}`,
-        display: "flex",
-        overflow: "hidden",
-      },
-      children: [
-        // Wavy water surface — single SVG path (Satori supports <path>).
-        {
-          type: "svg",
-          props: {
-            width: size,
-            height: water,
-            viewBox: "0 0 100 70",
-            preserveAspectRatio: "none",
-            style: { position: "absolute", left: 0, bottom: 0 },
-            children: [
-              {
-                type: "path",
-                props: {
-                  d: "M 0 14 Q 12 6, 25 14 T 50 14 T 75 14 T 100 14 L 100 70 L 0 70 Z",
-                  fill: COBALT,
-                },
-              },
-            ],
-          },
-        },
-        // "D" centered, sitting on the floor of the tank.
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "flex-end",
-              justifyContent: "center",
-              paddingBottom: `${Math.round(size * 0.04)}px`,
-              fontFamily: "Playfair Display",
-              fontWeight: 700,
-              fontSize: Math.round(size * 0.6),
-              lineHeight: 1,
-              color: CREAM,
-            },
-            children: "D",
-          },
-        },
-      ],
-    },
-  };
-};
+// Brand logo — a pre-rasterized PNG of the favicon design (with
+// "DF" instead of "D"). Using an image instead of inline SVG/paths
+// means the letter rendering is identical to the favicon and not
+// at the mercy of Satori's font lookup.
+const TankLogo = (size: number) => ({
+  type: "img",
+  props: {
+    src: logoDataUrl,
+    width: size,
+    height: size,
+    style: { width: `${size}px`, height: `${size}px` },
+  },
+});
 
 // — Endpoint --------------------------------------------------------
 export const GET: APIRoute<Page> = async ({ props }) => {
@@ -172,7 +131,10 @@ export const GET: APIRoute<Page> = async ({ props }) => {
               },
             },
           },
-          // Main content area
+          // Main content area — logo at the top, then title + caption
+          // flowing directly below it. The bottom-right wordmark is
+          // anchored independently via absolute positioning further
+          // down so this column can stay loose.
           {
             type: "div",
             props: {
@@ -181,23 +143,23 @@ export const GET: APIRoute<Page> = async ({ props }) => {
                 display: "flex",
                 flexDirection: "column",
                 padding: "60px 70px",
-                gap: "32px",
+                gap: "36px",
               },
               children: [
-                // Top-left logo
                 TankLogo(110),
-                // Title + description block, pushed down with margin
                 {
                   type: "div",
                   props: {
                     style: {
-                      marginTop: "auto",
                       display: "flex",
                       flexDirection: "column",
                       gap: "16px",
-                      // Leave room on the right edge for the "Donnie.com"
-                      // mark so long descriptions never crowd it.
-                      maxWidth: "920px",
+                      // Hard-cap the width so long titles and
+                      // descriptions can never crowd the "Donnie.com"
+                      // brand mark in the bottom-right corner. Satori
+                      // treats maxWidth loosely on flex columns, so
+                      // we use an explicit width.
+                      width: "760px",
                     },
                     children: [
                       {
