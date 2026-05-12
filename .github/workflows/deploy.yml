@@ -14,12 +14,18 @@ permissions:
   pages: write
   id-token: write
 
+# Opt JavaScript actions into Node 24 so transitively-used actions
+# (setup-node, upload-artifact inside withastro/action) don't trip
+# the Node 20 deprecation warning.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout your repository using git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install, build, and upload your site
         uses: withastro/action@v3
         with:
