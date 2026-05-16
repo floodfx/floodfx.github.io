@@ -121,6 +121,10 @@ Both `src/pages/posts/[...slug].astro` and `src/pages/rss.xml.js` already use th
 - The **`max-w-[1100px]` + `px-6` outer container** is the page rhythm. Keep new sections consistent with it.
 - The **eyebrow + h2 + lede** pattern at the top of every section. It's the design system's section header — reuse it, don't reinvent it.
 
+## PR conventions
+
+- **Never include a "Test plan" section in PR descriptions.** Summary only.
+
 ## When in doubt
 
 - Read [README.md](./README.md) for the user-facing contract.
