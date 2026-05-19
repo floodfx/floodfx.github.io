@@ -1,8 +1,12 @@
 export function formatDate(date: Date) {
+  // Format in UTC — frontmatter dates like "2026-05-17" parse as UTC
+  // midnight, so any negative-offset locale (US) would render them as
+  // the previous day.
   return Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "UTC",
   }).format(date);
 }
 

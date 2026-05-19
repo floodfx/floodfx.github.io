@@ -56,6 +56,25 @@ const x: number = 1;
 
 Both light and dark themes are emitted as CSS variables; the active one is selected by `html.dark` (see `.astro-code` rules in `src/styles/global.css`).
 
+**Dates render in UTC.** `formatDate` in `src/lib/utils.ts` forces `timeZone: "UTC"`. A frontmatter `date: "2026-05-17"` parses as UTC midnight; without the override it renders as May 16 in any negative-offset locale. Keep `timeZone: "UTC"` if you touch that helper.
+
+#### Embedding YouTube / Vimeo
+
+Wrap the iframe in `<div class="video-embed">…</div>`. The `.video-embed` rule in `global.css` makes it a 16:9 fluid container with rounded corners. Example: `src/content/posts/why-road-bike-racing-is-my-favorite-sport.md`.
+
+#### Giving a post artwork (home-page tile + post-page header)
+
+Posts don't carry artwork directly — instead, **pair the post with a project entry** whose `href` points back to the post. The post-page template (`src/pages/posts/[...slug].astro`) looks up that match and renders the project's `<ProjectArt>` at the top of the post; the same artwork shows on the home-page gallery wall via the projects loop.
+
+Steps:
+1. Add a component in `src/components/art/` (e.g. `GuitarLyricArt.astro`). Position it `absolute; inset: 0;` so it fills the parent canvas.
+2. Register it in `src/components/ProjectArt.astro` (import + add a `case` to the dispatcher).
+3. Create the paired project entry in `src/content/projects/<slug>.md` with `badge: "Writing"`, `meta: "Essay"`, `href: "/posts/<slug>"`, and `artwork: "<key>"`. The road-bike post (`road-bike-racing.md`) and the guitar post (`learning-guitar-at-47.md`) are the working examples.
+
+Gotchas:
+- The post-page header canvas is **16:10 landscape** with `object-fit: cover`. Portrait artwork (the lino-cut bike is 1122×1402) gets cropped. If un-cropped display matters, give the art component an `inline-block`-style natural aspect override (RoadBikeArt does this for the gallery via `:global .frame-canvas:has(.rb-art)`).
+- Lyric/text art should use container queries (`container-type: inline-size` + `clamp(min, Xcqi, max)` font size) so it stays legible across the wall's sm/md/lg/xl sizes without per-size overrides.
+
 ### A project
 
 Create `src/content/projects/<slug>.md`:
