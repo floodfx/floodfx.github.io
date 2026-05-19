@@ -1,0 +1,35 @@
+---
+// Vintage-typewriter lyric card for the "Learning Guitar at 47" post.
+// Three lines on a stark black ground, set in Special Elite to evoke
+// a typewritten page. Fills its parent .frame-canvas.
+---
+
+<div class="lyric-art">
+  <p>love of mine</p>
+  <p>someday</p>
+  <p>you will die</p>
+</div>
+
+<style>
+  .lyric-art {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    color: #ede6d3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    font-family: "Special Elite", "Courier New", ui-monospace, monospace;
+    /* Scales with the frame so the type stays readable across wall
+       sizes (sm/md/lg/xl) without per-size overrides. */
+    font-size: clamp(11px, 1.6cqi, 22px);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 1px rgba(237, 230, 211, 0.4);
+    container-type: inline-size;
+  }
+  .lyric-art p {
+    margin: 0;
+  }
+</style>

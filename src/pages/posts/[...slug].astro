@@ -1,6 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import ProjectArt from "../../components/ProjectArt.astro";
 import { formatDate } from "../../lib/utils";
 import { AUTHOR_NAME, SITE_TITLE, SITE_URL } from "../../consts";
 
@@ -15,6 +16,15 @@ type Props = CollectionEntry<"posts">;
 
 const post = Astro.props;
 const { Content } = await render(post);
+
+// Find the matching project tile (if any) so we can reuse its
+// artwork at the top of the post. Projects link out to posts via
+// `href: "/posts/<slug>"` — see road-bike-racing.md, learning-guitar-at-47.md.
+const projects = await getCollection("projects");
+const postPath = `/posts/${post.id}`;
+const projectMatch = projects.find(
+  (p) => p.data.href === postPath || p.data.href === `${postPath}/`,
+);
 
 const postUrl = new URL(`/posts/${post.id}`, SITE_URL).toString();
 const ogUrl = new URL(`/og/posts/${post.id}.png`, SITE_URL).toString();
@@ -95,6 +105,20 @@ const articleLD = {
       )
     }
 
+    {
+      projectMatch && (
+        <figure class="post-art">
+          <div class="post-art-canvas">
+            <ProjectArt
+              artwork={projectMatch.data.artwork}
+              index={0}
+              thumbColor={projectMatch.data.thumbColor}
+            />
+          </div>
+        </figure>
+      )
+    }
+
     <hr class="my-8 border-0 border-t border-dashed border-line-soft" />
 
     <article>
@@ -102,3 +126,23 @@ const articleLD = {
     </article>
   </section>
 </Layout>
+
+<style>
+  /* Headline artwork echoing the home-page gallery tile. The canvas
+     hosts the same <ProjectArt> component, so artwork imagery stays
+     centralized in src/components/art/. Aspect ratio matches a
+     wide-landscape tile so lyric/text art and photographic art both
+     read well at the top of a post. */
+  .post-art {
+    margin: 0 0 1rem;
+  }
+  .post-art-canvas {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.45),
+      0 8px 22px -14px rgba(0, 0, 0, 0.35);
+  }
+</style>

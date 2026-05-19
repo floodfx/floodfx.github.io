@@ -12,6 +12,7 @@ import LiveViewJSPoster from "./art/LiveViewJSPoster.astro";
 import HotDogJSArt from "./art/HotDogJSArt.astro";
 import GstateArt from "./art/GstateArt.astro";
 import RoadBikeArt from "./art/RoadBikeArt.astro";
+import GuitarLyricArt from "./art/GuitarLyricArt.astro";
 
 interface Props {
   artwork?: string;
@@ -40,6 +41,8 @@ const thumbBgClass: Record<string, string> = {
     <GstateArt />
   ) : artwork === "roadbike" ? (
     <RoadBikeArt />
+  ) : artwork === "guitar-lyric" ? (
+    <GuitarLyricArt />
   ) : (
     <div class={`fallback-canvas ${thumbBgClass[thumbColor]}`}>
       <span class="fallback-num">{String(index + 1).padStart(2, "0")}</span>
